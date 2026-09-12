@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-
+/**
+ * REST controller providing /api/hello and /api/info endpoints
+ * for laboratory work No. 1.
+ */
 @RestController
 @RequestMapping("/api")
 public class HelloController {
