@@ -40,4 +40,12 @@ public class NotificationService {
     public Set<String> names() {
         return byName.keySet();
     }
+
+    public String viaName(String beanName, String message) {
+        Notifier notifier = byName.get(beanName);
+        if (notifier == null) {
+            throw new IllegalArgumentException("No notifier registered under name: " + beanName);
+        }
+        return notifier.send(message);
+    }
 }

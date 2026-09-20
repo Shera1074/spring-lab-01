@@ -46,4 +46,9 @@ public class Lab2Controller {
     public Map<String, Object> scopes() {
         return ticketOffice.demo();
     }
+
+    @GetMapping("/custom")
+    public Map<String, String> custom(@RequestParam(defaultValue = "Hello") String text) {
+        return Map.of("prefixed", notifications.viaName("prefixed", text));
+    }
 }
