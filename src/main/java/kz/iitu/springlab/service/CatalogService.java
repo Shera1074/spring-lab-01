@@ -1,7 +1,7 @@
 package kz.iitu.springlab.service;
 
 import kz.iitu.springlab.audit.Audited;
-import kz.iitu.springlab.aspect.variants.RateLimited;
+import kz.iitu.springlab.audit.Sensitive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -12,12 +12,12 @@ import java.util.stream.IntStream;
 @Service
 public class CatalogService {
 
+    // Task 4.5: self-reference (goes through the proxy).
+    // @Lazy avoids the circular-reference error in Spring Boot 2.6+.
     @Autowired
     @Lazy
     private CatalogService self;
 
-    // Ограничение: максимум 3 запроса в течение 10 секунд
-    @RateLimited(maxRequests = 3, timeWindowMs = 10000)
     public String findById(long id) {
         sleep(50);
         return "Item no. " + id;
@@ -39,17 +39,27 @@ public class CatalogService {
         return "Removed item no. " + id;
     }
 
+    // BEFORE the fix: calls via this -> past the proxy -> aspects do NOT fire for remove()
     public String removeTwice(long id) {
-        String first = self.remove(id);
+        String first  = remove(id);
+        String second = remove(id + 1);
+        return first + "; " + second;
+    }
+
+    // AFTER the fix: calls via self -> through the proxy -> aspects fire
+    public String removeTwiceFixed(long id) {
+        String first  = self.remove(id);
         String second = self.remove(id + 1);
         return first + "; " + second;
     }
 
+    // Variant 4: the password argument is masked in the log by MaskingAspect
+    public String login(String username, @Sensitive String password) {
+        return "User " + username + " logged in";
+    }
+
     private void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        try { Thread.sleep(ms); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 }
