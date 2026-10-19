@@ -4,6 +4,10 @@ import jakarta.validation.constraints.*;
 
 public record BookRequest(
 
+        @Null(groups = ValidationGroups.Create.class)
+        @NotNull(groups = ValidationGroups.Update.class)
+        Long id,
+
         @NotBlank(groups = {
                 ValidationGroups.Create.class,
                 ValidationGroups.Update.class

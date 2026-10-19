@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 import kz.iitu.springlab.dto.BookRequest;
+import kz.iitu.springlab.dto.BookMapper;
 import kz.iitu.springlab.dto.ValidationGroups;
 import org.springframework.validation.annotation.Validated;
 
@@ -39,12 +40,7 @@ public class BookRestController {
             @Validated(ValidationGroups.Create.class)
             BookRequest request) {
 
-        Book book = new Book(
-                null,
-                request.title(),
-                request.author(),
-                request.year()
-        );
+        Book book = BookMapper.toEntity(request, null);
 
         Book saved = service.create(book);
 
@@ -60,12 +56,10 @@ public class BookRestController {
             @Validated(ValidationGroups.Update.class)
             BookRequest request) {
 
-        Book book = new Book(
-                id,
-                request.title(),
-                request.author(),
-                request.year()
-        );
+        if (!java.util.Objects.equals(request.id(), id)) {
+            return ResponseEntity.badRequest().build();
+        }
+        Book book = BookMapper.toEntity(request, id);
 
         return service.replace(id, book)
                 .map(ResponseEntity::ok)
