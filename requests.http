@@ -1,0 +1,9 @@
+### Create a book for testing
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title": "REST API Testing",
+  "author": "Test Author",
+  "year": 2025
+}
